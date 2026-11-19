@@ -1,61 +1,56 @@
 #include <stdio.h>
-#include <time.h>
 #include "chip8.h"
+#include "platform.h"
 
-#define CYCLES_PER_FRAME 10 // 10 * 60 = 600 Hz de CPU
-
-static void render_console(const chip8_t* chip8);
+#define WINDOW_TITLE "Chip-8 Emulator"
+#define WINDOW_WIDTH 640
+#define WINDOW_HEIGHT 320
 
 int main(int argc, char *argv[]) {
     chip8_t chip8;
-    bool rom_loaded = false;
-    struct timespec ts = {
-        .tv_sec = 0,
-        .tv_nsec = 16000000L // 16.000.000 nanosegundos = 16 milisegundos
-    };
+    platform_t platform;
+    const uint32_t frame_delay = 1000 / 60;
+    uint32_t frame_start;
+    uint32_t frame_time;
+    bool running = true;
 
     if (argc < 2) {
         printf("Usage: %s <rom_path>\n", argv[0]);
-        return -1;
+        return 1;
     }
-    
-    puts("Initializing Chip-8 emulator!");
 
     chip8_init(&chip8);
 
-    printf("Loading rom from: %s...\n", argv[1]);
+    if (!chip8_load_rom(&chip8, argv[1])) {
+        printf("Couldn't load ROM at %s\n", argv[1]);
+        return 1;
+    }
+    
+    if (!platform_init(&platform, WINDOW_TITLE, WINDOW_WIDTH, WINDOW_HEIGHT)) {
+        printf("Couldn't initialize SDL2! Error code: %s\n", SDL_GetError());
+        return 1;
+    }
+    
+    while (running) {
+        frame_start = SDL_GetTicks();
 
-    rom_loaded = chip8_load_rom(&chip8, argv[1]);
+        running = platform_process_input(chip8.keypad);
 
-    printf("Loaded: %d\n", rom_loaded);
-
-    while (true) {
-        for (int i = 0; i < CYCLES_PER_FRAME; i++) {
+        for (int i = 0; i < 10; i++) {
             chip8_cycle(&chip8);
         }
 
         chip8_tick_timers(&chip8, NULL);
-        render_console(&chip8);
+        platform_update(&platform, chip8_get_display(&chip8));
 
-        nanosleep(&ts, NULL);
+        frame_time = SDL_GetTicks() - frame_start;
+
+        if (frame_time < frame_delay) {
+            SDL_Delay(frame_delay - frame_time);
+        }
     }
+
+    platform_destroy(&platform);
 
     return 0;
-}
-
-static void render_console(const chip8_t* chip8) {
-    const uint8_t* display = chip8_get_display(chip8);
-    uint8_t pixel;
-
-    // Mueve el cursor arriba a la izquierda para sobreescribir el frame anterior sin parpadeo
-    printf("\033[H");
-
-    for (int y = 0; y < DISPLAY_HEIGHT; y++) {
-        for (int x = 0; x < DISPLAY_WIDTH; x++) {
-            pixel = display[(y * DISPLAY_WIDTH) + x];
-
-            printf("%c", pixel ? '#' : ' ');
-        }
-        printf("\n");
-    }
 }

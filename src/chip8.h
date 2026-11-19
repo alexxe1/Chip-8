@@ -1,3 +1,6 @@
+#ifndef CHIP8_H
+#define CHIP8_H
+
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -25,3 +28,5 @@ bool chip8_load_rom(chip8_t* chip8, const char* rom_path);
 void chip8_cycle(chip8_t* chip8);
 void chip8_tick_timers(chip8_t* chip8, void (*on_sound_active)(void));
 const uint8_t* chip8_get_display(const chip8_t* chip8);
+
+#endif
