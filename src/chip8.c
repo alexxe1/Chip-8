@@ -365,19 +365,20 @@ static void op_ld_vx_k(chip8_t* chip8, uint8_t x) {
     }   
 }
 
-void chip8_tick_timers(chip8_t* chip8, void (*on_sound_active)(void)) {
+void chip8_tick_timers(chip8_t* chip8) {
     if (chip8->reg_dt > 0) {
         chip8->reg_dt--;
     }
 
     if (chip8->reg_st > 0) {
-        if (on_sound_active != NULL) {
-            on_sound_active();
-        }
         chip8->reg_st--;
     }
 }
 
 const uint8_t* chip8_get_display(const chip8_t* chip8) {
     return chip8->display;
+}
+
+bool chip8_is_sound_active(const chip8_t* chip8) {
+    return chip8->reg_st > 0;
 }

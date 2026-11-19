@@ -2,11 +2,20 @@
 #include "platform.h"
 
 static int map_key(SDL_Keycode key);
+static void audio_callback(void* userdata, uint8_t* stream, int len);
 
 bool platform_init(platform_t* platform, const char* title, int window_width, int window_height) {
+    SDL_AudioSpec desired_spec = {
+        .freq = 44100,
+        .format = AUDIO_S16SYS, // 16 bits signed int
+        .channels = 1, // Mono
+        .samples = 512,
+        .callback = audio_callback
+    };
+    
     memset(platform, 0, sizeof(platform_t));
     
-    if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0) {
         return false;
     }
 
@@ -47,6 +56,16 @@ bool platform_init(platform_t* platform, const char* title, int window_width, in
         return false;
     }
 
+    platform->audio_device = SDL_OpenAudioDevice(NULL, 0, &desired_spec, NULL, 0);
+
+    if (platform->audio_device == 0) {
+        SDL_DestroyTexture(platform->texture);
+        SDL_DestroyRenderer(platform->renderer);
+        SDL_DestroyWindow(platform->window);
+        SDL_Quit();
+        return false;
+    }
+
     return true;
 }
 
@@ -54,6 +73,7 @@ void platform_destroy(platform_t* platform) {
     SDL_DestroyTexture(platform->texture);
     SDL_DestroyRenderer(platform->renderer);
     SDL_DestroyWindow(platform->window);
+    SDL_CloseAudioDevice(platform->audio_device);
     SDL_Quit();
 }
 
@@ -93,6 +113,10 @@ bool platform_process_input(uint8_t* keypad) {
     return true;
 }
 
+void platform_set_sound(platform_t* platform, bool active) {
+    SDL_PauseAudioDevice(platform->audio_device, active ? 0 : 1);
+}
+
 static int map_key(SDL_Keycode key) {
     switch (key) {
         case SDLK_x: return 0x0;
@@ -112,5 +136,21 @@ static int map_key(SDL_Keycode key) {
         case SDLK_c: return 0xB;
         case SDLK_v: return 0xF;
         default: return -1;
+    }
+}
+
+static void audio_callback(void* userdata, uint8_t* stream, int len) {
+    (void)userdata;
+    int16_t* buffer = (int16_t*)stream;
+    int samples = len / sizeof(int16_t);
+    static uint32_t sample_index = 0;
+
+    // 44,100 Hz / 440 Hz = ~100 samples per complete wave cycle (50 above, 50 below).
+    const int period = 100;
+    const int16_t amplitude = 3000; // Moderate volume (the maximum value of int16_t is 32767)
+
+    for (int i = 0; i < samples; i++) {
+        buffer[i] = ((sample_index / (period / 2)) % 2 == 0) ? amplitude : -amplitude;
+        sample_index++;
     }
 }

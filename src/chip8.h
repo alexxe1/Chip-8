@@ -26,7 +26,8 @@ typedef struct {
 void chip8_init(chip8_t* chip8);
 bool chip8_load_rom(chip8_t* chip8, const char* rom_path);
 void chip8_cycle(chip8_t* chip8);
-void chip8_tick_timers(chip8_t* chip8, void (*on_sound_active)(void));
+void chip8_tick_timers(chip8_t* chip8);
 const uint8_t* chip8_get_display(const chip8_t* chip8);
+bool chip8_is_sound_active(const chip8_t* chip8);
 
 #endif

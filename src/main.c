@@ -40,7 +40,9 @@ int main(int argc, char *argv[]) {
             chip8_cycle(&chip8);
         }
 
-        chip8_tick_timers(&chip8, NULL);
+        chip8_tick_timers(&chip8);
+        
+        platform_set_sound(&platform, chip8_is_sound_active(&chip8));
         platform_update(&platform, chip8_get_display(&chip8));
 
         frame_time = SDL_GetTicks() - frame_start;

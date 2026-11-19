@@ -12,6 +12,7 @@ typedef struct {
     SDL_Window* window;
     SDL_Renderer* renderer;
     SDL_Texture* texture;
+    SDL_AudioDeviceID audio_device;
     uint32_t pixel_buffer[TEXTURE_WIDTH * TEXTURE_HEIGHT];
 } platform_t;
 
@@ -19,5 +20,6 @@ bool platform_init(platform_t* platform, const char* title, int window_width, in
 void platform_destroy(platform_t* platform);
 void platform_update(platform_t* platform, const uint8_t* display);
 bool platform_process_input(uint8_t* keypad);
+void platform_set_sound(platform_t* platform, bool active);
 
 #endif
