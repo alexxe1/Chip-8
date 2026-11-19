@@ -1,30 +1,48 @@
 # CHIP-8 Emulator
 
-A CHIP-8 interpreter written in C11. Currently runs in the terminal for testing and debugging core instructions, with SDL2 support planned for graphics, input, and sound.
+A CHIP-8 interpreter written in C11 using SDL2 for graphics, input, and audio.
 
 ## Features
 
 - Full original 35-opcode instruction set
 - 4KB memory, 16 8-bit registers, stack, delay and sound timers
-- 64x32 monochrome display rendered in ASCII
-- Decoupled core logic ready for a graphical frontend
+- 64x32 monochrome display scaled via SDL2 streaming textures
+- 16-key hexadecimal keypad mapped to QWERTY
+- 440Hz square wave buzzer for the sound timer
+
+## Requirements
+
+- `gcc`
+- `make`
+- `libsdl2-dev`
+
+On Debian/Ubuntu:
+
+    sudo apt install build-essential libsdl2-dev
 
 ## Build
-
-Requires gcc and make:
 
     make
 
 ## Usage
 
-Pass the path to a .ch8 ROM file:
+Pass the path to a `.ch8` ROM file:
 
-    ./chip8 roms/ibm.ch8
+    ./chip8 roms/pong.ch8
 
-## Roadmap
+Press `ESC` or close the window to quit.
 
-- [x] Core CPU and opcode decoding
-- [x] Terminal display output
-- [ ] SDL2 window and pixel rendering
-- [ ] Hex keypad mapping
-- [ ] Audio output for the sound timer
+## Controls
+
+The original 4x4 hexadecimal keypad is mapped to the left side of a QWERTY keyboard:
+
+    CHIP-8 Keypad       PC Keyboard
+    +---+---+---+---+   +---+---+---+---+
+    | 1 | 2 | 3 | C |   | 1 | 2 | 3 | 4 |
+    +---+---+---+---+   +---+---+---+---+
+    | 4 | 5 | 6 | D |   | Q | W | E | R |
+    +---+---+---+---+   +---+---+---+---+
+    | 7 | 8 | 9 | E |   | A | S | D | F |
+    +---+---+---+---+   +---+---+---+---+
+    | A | 0 | B | F |   | Z | X | C | V |
+    +---+---+---+---+   +---+---+---+---+
