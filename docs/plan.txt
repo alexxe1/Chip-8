@@ -1,0 +1,20 @@
+PLAN DE ACCIÓN
+
+0) Inicializar el estado de la máquina con los valores por defecto
+1) Cargar ROM en memoria desde 0x200 hasta 0xFFF
+2) Cargar los números hexadecimales desde 0x000 hasta 0x1FF
+3) Bucle principal (leer instrucción, decodificar, ejecutar) y decrementar DT/ST si se puede
+4) Limpiar todo lo usado
+
+VARIABLES
+
+memory = array de 4096 de largo con 1 byte en cada elemento
+registers = array de 16 de largo con 1 byte en cada elemento
+reg_i = 2 bytes
+reg_dt = 1 byte
+reg_st = 1 byte
+pc = 2 bytes
+sp = 1 byte
+stack = array de 16 de largo con 2 bytes en cada elemento
+display = array de 2048 de largo con 1 byte en cada elemento
+keypad = array de 16 de largo con 1 byte cada elemento (prendido o apagado cada tecla)

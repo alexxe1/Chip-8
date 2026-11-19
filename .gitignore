@@ -1,0 +1,19 @@
+# Bin
+chip8
+*.o
+*.out
+*.exe
+
+# Depuration
+*.dSYM/
+vgcore.*
+core
+
+# Config
+.vscode/
+*.swp
+*~
+
+# OS
+.DS_Store
+Thumbs.db
